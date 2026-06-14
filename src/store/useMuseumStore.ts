@@ -196,13 +196,50 @@ export const useMuseumStore = create<MuseumStore>((set, get) => ({
     
     let streak = 0;
     if (total > 0) {
-      const sorted = [...challengeRecords].sort((a, b) => b.completedAt - a.completedAt);
-      const today = getToday();
-      const lastDate = new Date(sorted[0].completedAt);
-      const lastDateStr = `${lastDate.getFullYear()}-${String(lastDate.getMonth()+1).padStart(2,'0')}-${String(lastDate.getDate()).padStart(2,'0')}`;
+      const uniqueDates = new Set<string>();
+      challengeRecords.forEach(record => {
+        const d = new Date(record.completedAt);
+        const dateStr = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+        uniqueDates.add(dateStr);
+      });
       
-      if (lastDateStr === today || true) {
+      const sortedDates = Array.from(uniqueDates).sort().reverse();
+      const today = getToday();
+      
+      let currentDate = new Date();
+      const todayStr = `${currentDate.getFullYear()}-${String(currentDate.getMonth()+1).padStart(2,'0')}-${String(currentDate.getDate()).padStart(2,'0')}`;
+      
+      if (sortedDates[0] === todayStr) {
         streak = 1;
+        for (let i = 1; i < sortedDates.length; i++) {
+          currentDate.setDate(currentDate.getDate() - 1);
+          const prevDateStr = `${currentDate.getFullYear()}-${String(currentDate.getMonth()+1).padStart(2,'0')}-${String(currentDate.getDate()).padStart(2,'0')}`;
+          
+          if (sortedDates[i] === prevDateStr) {
+            streak++;
+          } else {
+            break;
+          }
+        }
+      } else {
+        let yesterday = new Date();
+        yesterday.setDate(yesterday.getDate() - 1);
+        const yesterdayStr = `${yesterday.getFullYear()}-${String(yesterday.getMonth()+1).padStart(2,'0')}-${String(yesterday.getDate()).padStart(2,'0')}`;
+        
+        if (sortedDates[0] === yesterdayStr) {
+          streak = 1;
+          currentDate = yesterday;
+          for (let i = 1; i < sortedDates.length; i++) {
+            currentDate.setDate(currentDate.getDate() - 1);
+            const prevDateStr = `${currentDate.getFullYear()}-${String(currentDate.getMonth()+1).padStart(2,'0')}-${String(currentDate.getDate()).padStart(2,'0')}`;
+            
+            if (sortedDates[i] === prevDateStr) {
+              streak++;
+            } else {
+              break;
+            }
+          }
+        }
       }
     }
     

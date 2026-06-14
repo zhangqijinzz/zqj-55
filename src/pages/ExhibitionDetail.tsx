@@ -46,6 +46,23 @@ export default function ExhibitionDetail() {
     }
   }, [id, getExhibitionById, exhibits]);
 
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        if (showDeleteModal) {
+          setShowDeleteModal(false);
+        }
+        if (showAddModal) {
+          setShowAddModal(false);
+          setSelectedIds([]);
+          setSearchQuery('');
+        }
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [showDeleteModal, showAddModal]);
+
   const availableExhibits = exhibits.filter(e => {
     const isInExhibition = exhibition?.exhibitIds.includes(e.id);
     const matchesSearch = searchQuery

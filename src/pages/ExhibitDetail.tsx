@@ -30,6 +30,16 @@ export default function ExhibitDetail() {
       setExhibit(getExhibitById(id));
     }
   }, [id, getExhibitById]);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && showDeleteModal) {
+        setShowDeleteModal(false);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [showDeleteModal]);
   
   const exhibitIndex = exhibits.findIndex(e => e.id === id);
   const prevExhibit = exhibitIndex > 0 ? exhibits[exhibitIndex - 1] : null;
